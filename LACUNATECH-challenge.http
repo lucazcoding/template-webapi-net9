@@ -1,0 +1,6 @@
+@LACUNATECH_challenge_HostAddress = http://localhost:5089
+
+GET {{LACUNATECH_challenge_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
