@@ -1,18 +1,23 @@
-using System.Text.Json;
+using System.Net.Http.Headers;
+using LACUNATECH_challenge;
+using LACUNATECH_challenge.Models;
+using LACUNATECH_challenge.Services;
+using LACUNATECH_challenge.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
-
-
-app.MapPost("/sum", (JsonElement body) =>
+builder.Services.AddHttpClient<LumaApiClient>(client =>
 {
-    int a = body.GetProperty("a").GetInt32();
-    int b = body.GetProperty("b").GetInt32();
-
-    return a + b;
+    client.BaseAddress = new Uri("https://luma.lacuna.cc/");
+    client.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
+// Apenas o estado fica Singleton
+builder.Services.AddSingleton<ProbeClockStore>(); // guarda os offsets
+builder.Services.AddScoped<SyncService>();      // lógica
+builder.Services.AddScoped<JobService>();       // lógica
+builder.Services.AddHostedService<LumaWorker>();
 
+var app = builder.Build();
 app.Run();
